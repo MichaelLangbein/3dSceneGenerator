@@ -1,0 +1,11 @@
+{
+  "name": "3dSceneGenerator",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+   "run": ""
+  },
+  "keywords": [],
+  "author": "Michael Langbein <michael.langbein@dlr.de>",
+  "license": "MIT"
+}
