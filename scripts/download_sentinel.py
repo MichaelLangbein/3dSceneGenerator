@@ -11,7 +11,7 @@ from pyproj.transformer import Transformer
 
 #%% Part 0: directories
 thisDir = os.getcwd()
-assetDir = os.path.join(thisDir, '..', 'data')
+assetDir = os.path.realpath(os.path.join(thisDir, '..', 'data'))
 sentinelDir = os.path.join(assetDir, 'sentinel')
 os.makedirs(sentinelDir, exist_ok=True)
 
