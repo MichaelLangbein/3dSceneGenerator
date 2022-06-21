@@ -1,6 +1,6 @@
 {
-  "name": "3dSceneGenerator",
-  "version": "1.0.0",
+  "name": "3js scene",
+  "version": "0.0.1",
   "description": "",
   "scripts": {
    "run": ""

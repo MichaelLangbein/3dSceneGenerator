@@ -1,3 +1,6 @@
 data
 node_modules
-scripts/shapefiles
+scripts/shapefiles/**/*.shp
+scripts/shapefiles/**/*.shx
+scripts/shapefiles/**/*.dbf
+scripts/shapefiles/**/*.prj
