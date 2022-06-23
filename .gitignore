@@ -1,6 +1,9 @@
 data
+nn/data/**/*
+!nn/data/**/download.sh
 node_modules
 scripts/shapefiles/**/*.shp
 scripts/shapefiles/**/*.shx
 scripts/shapefiles/**/*.dbf
 scripts/shapefiles/**/*.prj
+/**/*.pyc
