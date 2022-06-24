@@ -41,8 +41,10 @@ def downloadSentinelData(bbox, maxItems, maxCloudCover):
     
     for item in searchResults.get_items():
         for key, val in item.assets.items():
+
             if val.href.endswith('tif'):
                 print(f"Reading {val.href} ...")
+
                 with rio.open(val.href) as fh:
                     coordTransformer = Transformer.from_crs('EPSG:4326', fh.crs)
                     coordUpperLeft = coordTransformer.transform(bbox[3], bbox[0])
@@ -50,18 +52,31 @@ def downloadSentinelData(bbox, maxItems, maxCloudCover):
                     pixelUpperLeft = fh.index( coordUpperLeft[0],  coordUpperLeft[1] )
                     pixelLowerRight = fh.index( coordLowerRight[0],  coordLowerRight[1] )
                     # make http range request only for bytes in window
+                    # bands = list(range(1, fh.meta['count'] + 1))
                     window = rio.windows.Window.from_slices(
                         ( pixelUpperLeft[0],  pixelLowerRight[0] ), 
                         ( pixelUpperLeft[1],  pixelLowerRight[1] )
                     )
-                    subset = fh.read(1, window=window)
+                    subset = fh.read(window=window)
 
-                filePath = createFilePath(item.id, val.href)
-                print(f"Saving to {filePath} ...")
-                with open(filePath, 'wb') as fh:
-                    fh.write(subset)
+                    fileParas = fh.meta
+                    fileParas.update({
+                        "driver": "GTiff",
+                        "count": subset.shape[0],
+                        "height": subset.shape[1],
+                        "width": subset.shape[2],
+                    })
+
+                    filePath = createFilePath(item.id, val.href)
+                    with rio.open(filePath, "w", **fileParas) as dest:
+                        print(f"Saving to {filePath} ...")
+                        dest.write(subset)
+                    
 
     print("Done!")
+#%%
+bbox = [11.3, 48.0, 11.4, 48.1]
+downloadSentinelData(bbox, 1, 5)
 
 
 #%%
@@ -75,3 +90,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     downloadSentinelData(args.bbox, args.maxItems, args.maxCloudCover)
+
+
+
