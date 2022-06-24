@@ -43,7 +43,7 @@ from utils import downloadFromUrlTo, replaceInFile
 #%% Part 0: directories
 thisDir = os.getcwd()
 tileMakerDir = os.path.join(thisDir, 'tilemaker')
-assetDir = os.path.realpath(os.path.join(thisDir, '..', 'data'))
+assetDir = os.path.realpath(os.path.join(thisDir, 'data'))
 tmpDir = os.path.join(assetDir, 'tmp')
 vectorTileDir = os.path.join(assetDir, 'vectorTiles')
 os.makedirs(vectorTileDir, exist_ok=True)

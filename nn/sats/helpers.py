@@ -18,7 +18,7 @@ def displaySegmentImage(path):
 
 
 def saveModel(model: keras.Model, path: str, modelName: str):
-    fullPath = os.path.join(path, modelName + '_' + datetime.now().strftime("%d/%m/%Y_%H:%M:%S") )
+    fullPath = os.path.join(path, modelName + '_' + datetime.now().strftime("%d.%m.%Y_%H:%M:%S") )
     model.save(fullPath)
 
 def loadModel(path: str):

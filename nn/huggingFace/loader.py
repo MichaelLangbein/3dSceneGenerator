@@ -3,10 +3,11 @@ import numpy as np
 from tensorflow.keras.preprocessing.image import load_img
 
 
-class OxfordPets(keras.utils.Sequence):
+class SegmentationDataLoader(keras.utils.Sequence):
     """Helper to iterate over the data (as Numpy arrays)."""
 
-    def __init__(self, batch_size, img_size, input_img_paths, target_img_paths):
+    def __init__(self, 
+                batch_size, img_size, input_img_paths, target_img_paths):
         self.batch_size = batch_size
         self.img_size = img_size
         self.input_img_paths = input_img_paths
@@ -28,7 +29,5 @@ class OxfordPets(keras.utils.Sequence):
         for j, path in enumerate(batch_target_img_paths):
             img = load_img(path, target_size=self.img_size, color_mode="grayscale")
             y[j] = np.expand_dims(img, 2)
-            # Ground truth labels are 1, 2, 3. Subtract one to make them 0, 1, 2:
-            y[j] -= 1
         return x, y
 

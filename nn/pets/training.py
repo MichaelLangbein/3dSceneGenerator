@@ -6,14 +6,19 @@ Code adjusted from F.Cholet: https://keras.io/examples/vision/oxford_pets_image_
 #%%
 import os
 import random
-import PIL
+from PIL.ImageOps import autocontrast
 import numpy as np
+import tensorflow as tf
 from tensorflow import keras
 
-from helpers import displayColorImage, displaySegmentImage, saveModel
-from loader import OxfordPets
+from nn.utils.helpers import displayColorImage, displaySegmentImage, saveModel
+from loader import SegmentationDataLoader
 from net import unet
 
+
+#%%
+# Make sure we're using GPU
+tf.config.list_physical_devices('GPU')
 
 
 
@@ -29,17 +34,15 @@ IMAGE_SIZE = (160, 160)
 NUM_CLASSES = 3
 BATCH_SIZE = 32
 
-
-
-#%%
 input_img_paths = sorted([
         os.path.join(INPUT_DIR, fname)
-            for fname in os.listdir(INPUT_DIR) if fname.endswith(".jpg")
+            for fname in os.listdir(INPUT_DIR)
+            if fname.endswith(".jpg")
 ])
-
 target_img_paths = sorted([
         os.path.join(TARGET_DIR, fname)
-            for fname in os.listdir(TARGET_DIR) if fname.endswith(".png") and not fname.startswith(".")
+            for fname in os.listdir(TARGET_DIR)
+            if fname.endswith(".png") and not fname.startswith(".")
 ])
 
 print("Number of samples:", len(input_img_paths))
@@ -49,7 +52,13 @@ for input_path, target_path in zip(input_img_paths[:10], target_img_paths[:10]):
 
 
 #%%
-imgNr = 9
+
+for input_path, target_path in zip(input_img_paths[:10], target_img_paths[:10]):
+    print(input_path, "|", target_path)
+
+
+
+imgNr = 600
 displayColorImage(input_img_paths[imgNr])
 displaySegmentImage(target_img_paths[imgNr])
 
@@ -66,8 +75,8 @@ val_input_img_paths = input_img_paths[-val_samples:]
 val_target_img_paths = target_img_paths[-val_samples:]
 
 # Instantiate data Sequences for each split
-train_gen = OxfordPets(BATCH_SIZE, IMAGE_SIZE, train_input_img_paths, train_target_img_paths)
-val_gen   = OxfordPets(BATCH_SIZE, IMAGE_SIZE, val_input_img_paths, val_target_img_paths)
+train_gen = SegmentationDataLoader(BATCH_SIZE, IMAGE_SIZE, train_input_img_paths, train_target_img_paths)
+val_gen   = SegmentationDataLoader(BATCH_SIZE, IMAGE_SIZE, val_input_img_paths, val_target_img_paths)
 
 
 #%%
@@ -79,7 +88,7 @@ model = unet(IMAGE_SIZE, NUM_CLASSES)
 model.summary()
 # Configure the model for training.
 # We use the "sparse" version of categorical_crossentropy because our target data is integers.
-model.compile(optimizer="rmsprop", loss="sparse_categorical_crossentropy")
+model.compile(optimizer="adam", loss="sparse_categorical_crossentropy")
 
 callbacks = [keras.callbacks.ModelCheckpoint(f"{MODEL_DIR}/{MODEL_NAME}_checkpoint.h5", save_best_only=True)]
 
@@ -93,7 +102,7 @@ saveModel(model, MODEL_DIR, MODEL_NAME)
 #%%
 # Generate predictions for all images in the validation set
 
-val_gen = OxfordPets(BATCH_SIZE, IMAGE_SIZE, val_input_img_paths, val_target_img_paths)
+val_gen = SegmentationDataLoader(BATCH_SIZE, IMAGE_SIZE, val_input_img_paths, val_target_img_paths)
 val_preds = model.predict(val_gen)
 
 
@@ -102,15 +111,17 @@ def display_mask(i):
     """Quick utility to display a model's prediction."""
     mask = np.argmax(val_preds[i], axis=-1)
     mask = np.expand_dims(mask, axis=-1)
-    img = PIL.ImageOps.autocontrast(keras.preprocessing.image.array_to_img(mask))
+    img = autocontrast(keras.preprocessing.image.array_to_img(mask))
     display(img)
 
 
 # Display results for validation image #10
-i = 10
+i = 40
 # Display input image
 displayColorImage(val_input_img_paths[i])
 # Display ground-truth target mask
 displaySegmentImage(val_target_img_paths[i])
 # Display mask predicted by our model
-display_mask(i)  # Note that the model only sees inputs at 150x150.
+# display_mask(i)  # Note that the model only sees inputs at 150x150.
+
+# %%

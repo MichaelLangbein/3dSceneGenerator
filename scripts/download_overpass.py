@@ -9,7 +9,7 @@ import osm2geojson as o2g
 
 #%% Part 0: directories
 thisDir = os.getcwd()
-assetDir = os.path.realpath(os.path.join(thisDir, '..', 'data'))
+assetDir = os.path.realpath(os.path.join(thisDir, 'data'))
 overpassDir = os.path.join(assetDir, 'overpass')
 os.makedirs(overpassDir, exist_ok=True)
 
