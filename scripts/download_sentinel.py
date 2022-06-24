@@ -93,10 +93,11 @@ def downloadSentinelData(bbox, maxItems = 4, maxCloudCover = 10, targetProjectio
 
                     fileParas = fh.meta
                     fileParas.update({
-                        "driver": "GTiff",
-                        "count":  subset.shape[0],
-                        "height": subset.shape[1],
-                        "width":  subset.shape[2],
+                        "driver":    "GTiff",
+                        "count":     subset.shape[0],
+                        "height":    subset.shape[1],
+                        "width":     subset.shape[2],
+                        "transform": fh.window_transform(window)
                     })
 
                     filePath = createFilePath(item.id, val.href)
