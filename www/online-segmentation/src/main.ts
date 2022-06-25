@@ -5,12 +5,33 @@ import { Tile as TileLayer } from 'ol/layer';
 import WebGLTileLayer from 'ol/layer/WebGLTile';
 import { OSM, GeoTIFF } from 'ol/source';
 import { ScaleLine, Zoom, MousePosition, Attribution } from 'ol/control';
-import cogUrl from '../data/s2/TCI.tif?url';
 import { getViewParas } from './utils';
 import RasterSource from 'ol/source/Raster';
 import ImageLayer from 'ol/layer/Image';
-// const cogUrl = "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/32/U/PU/2022/6/S2B_32UPU_20220612_0_L2A/TCI.tif";
+import * as tf from '@tensorflow/tfjs';
 
+
+
+// const cogUrl = "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/32/U/PU/2022/6/S2B_32UPU_20220612_0_L2A/TCI.tif";
+import cogUrl from '../data/s2/TCI.tif?url';
+import modelUrl from '../../../nn/sats/trained_models/graphModel/model.json?url';
+
+
+
+const model = await tf.loadGraphModel(modelUrl);
+const inputTensor = tf.zeros([1, 256, 256, 3]);
+const outputTensor = model.predict(inputTensor) as tf.Tensor<tf.Rank.R4>;
+console.log(outputTensor)
+const outputTensor3d = tf.reshape<tf.Rank.R3>(outputTensor, [256, 256, 3]);
+const outputImage = await tf.browser.toPixels(outputTensor3d);
+console.log(outputImage);
+// const dummyData = zeros([1, 256, 256, 3]);
+// const output = model.predict(dummyData);
+// console.log(output);
+// console.log('model.metadata: ', model.metadata);
+// console.log('model.inputs: ', model.inputs);
+// console.log('model.modelSignature: ', model.modelSignature);
+// console.log('model.outputs: ', model.outputs);
 
 
 
@@ -44,6 +65,10 @@ const segmentedLayer = new ImageLayer({
             if (!isImageData(inputImages[0])) throw Error();
 
             const inputImage: ImageData = inputImages[0];
+            // const inputTensor = tf.browser.fromPixels(inputImage);
+            // const outputTensor = model.predict(inputTensor);
+            // const outputImage = tf.browser.toPixels(outputTensor);
+
             return inputImage;
         }
     })

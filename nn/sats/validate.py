@@ -1,12 +1,12 @@
 #%%
 from tensorflow import keras
-from config import BATCH_SIZE, IMAGE_SIZE, input_img_paths, target_img_paths
 from loader import SegmentationDataLoader
+from config import BATCH_SIZE, IMAGE_SIZE, input_img_paths, target_img_paths
 from helpers import displayColorImage, displaySegmentImage
 
 
 #%%
-path = "/home/michael/Desktop/code/3dSceneGenerator/nn/sats/data/sats/Val/trained_models/loveda_24/06/2022_16:04:24"
+path = "/home/michael/Desktop/code/3dSceneGenerator/nn/sats/data/trained_models/loveda_24/06/2022_16:04:24"
 model = keras.models.load_model(path)
 
 # %%
@@ -30,7 +30,9 @@ displaySegmentImage(val_target_img_paths[i])
 # %%
 import tensorflowjs as tfjs
 
-targetPath = "/home/michael/Desktop/code/3dSceneGenerator/nn/sats/data/tfjs/"
+targetPath = "/home/michael/Desktop/code/3dSceneGenerator/nn/sats/trained_models/tfjs/"
 tfjs.converters.save_keras_model(model, targetPath)
+targetPath2 = "/home/michael/Desktop/code/3dSceneGenerator/nn/sats/trained_models/tfjs2/"
+tfjs.converters.convert_tf_saved_model(targetPath, targetPath2)
 
 # %%

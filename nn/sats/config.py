@@ -3,12 +3,12 @@ import os
 
 #%%
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(THIS_DIR, 'data/sats/Val')
+DATA_DIR = os.path.join(THIS_DIR, 'data/Val')
 INPUT_DIR1 = os.path.join(DATA_DIR, 'Urban/images_png')
 TARGET_DIR1 = os.path.join(DATA_DIR, 'Urban/masks_png')
 INPUT_DIR2 = os.path.join(DATA_DIR, 'Rural/images_png')
 TARGET_DIR2 = os.path.join(DATA_DIR, 'Rural/masks_png')
-MODEL_DIR = os.path.join(DATA_DIR, 'trained_models')
+MODEL_DIR = os.path.join(THIS_DIR, 'trained_models')
 MODEL_NAME = 'loveda'
 IMAGE_SIZE = (256, 256)
 NUM_CLASSES = 8
