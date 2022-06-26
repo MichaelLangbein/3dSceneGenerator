@@ -18,14 +18,13 @@ import modelUrl from '../data/graphModel/model.json?url';
 
 
 
+
+
 const model = await tf.loadGraphModel(modelUrl);
-const inputTensor = tf.zeros([1, 256, 256, 3]);
-const outputTensor = model.predict(inputTensor) as tf.Tensor<tf.Rank.R4>;
-const data = outputTensor.arraySync();
-console.log(data);
-// const outputTensor3d = tf.reshape<tf.Rank.R3>(outputTensor, [256, 256, 8]);
-// const outputImage = await tf.browser.toPixels(outputTensor3d);
-// console.log(outputImage);
+// const inputTensor = tf.zeros([1, 256, 256, 3]);
+// const outputTensor = model.predict(inputTensor) as tf.Tensor<tf.Rank.R4>;
+// const data = outputTensor.arraySync();
+// console.log(data);
 
 
 const viewParameters = getViewParas('EPSG:4326');
@@ -57,11 +56,32 @@ const segmentedLayer = new ImageLayer({
             if (!isImageData(inputImages[0])) throw Error();
 
             const inputImage: ImageData = inputImages[0];
-            const inputTensor = tf.browser.fromPixels(inputImage);
-            const inputTensor4d = tf.reshape(inputTensor, [1, ... inputTensor.shape]);
-            const outputTensor = model.predict(inputTensor4d) as tf.Tensor<tf.Rank.R4>;
-            const outputData = outputTensor.dataSync();
-            const imageData = new Uint8ClampedArray();
+
+            const outputData = tf.tidy(() => {
+                const inputTensor = tf.browser.fromPixels(inputImage);
+                const inputTensor4d = tf.reshape(inputTensor, [1, ... inputTensor.shape]);
+                const outputTensor = model.predict(inputTensor4d) as tf.Tensor<tf.Rank.R4>;
+                const outputData = outputTensor.arraySync();
+                return outputData[0];
+            });
+
+            const classNr = 7;
+
+            const w = inputImage.width;
+            const h = inputImage.height;
+            const imageData: Uint8ClampedArray = new Uint8ClampedArray(w * h * 4);
+            for (let r = 0; r < outputData.length; r++) {
+                const row = outputData[r];
+                for (let c = 0; c < row.length; c++) {
+                    const pixelData = row[c];
+                    const classIntensity = pixelData[classNr];
+                    const color = Math.round(classIntensity * 255);
+                    imageData[r*w + c*4 + 0] = color;
+                    imageData[r*w + c*4 + 1] = color;
+                    imageData[r*w + c*4 + 2] = color;
+                    imageData[r*w + c*4 + 3] = color;
+                }
+            }
             const outputImage = new ImageData(imageData, inputImage.width, inputImage.height);
             return outputImage;
         }
@@ -80,3 +100,4 @@ const map = new Map({
     view: view,
     controls: controls,
 });
+
