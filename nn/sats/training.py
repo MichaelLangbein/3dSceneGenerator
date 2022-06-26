@@ -10,7 +10,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 
-from helpers import displayColorImage, displaySegmentImage, saveModel
+from helpers import displayColorImage, displaySegmentData, displaySegmentImage, saveModel
 from config import input_img_paths, target_img_paths, BATCH_SIZE, IMAGE_SIZE, NUM_CLASSES, MODEL_NAME, MODEL_DIR
 from loader import SegmentationDataLoader
 from net import unet
@@ -78,6 +78,6 @@ displayColorImage(val_input_img_paths[i])
 # Display ground-truth target mask
 displaySegmentImage(val_target_img_paths[i])
 # Display mask predicted by our model
-# display_mask(i)  # Note that the model only sees inputs at 150x150.
+displaySegmentData(val_preds[i])  # Note that the model only sees inputs at 150x150.
 
 # %%

@@ -2,7 +2,7 @@
 from tensorflow import keras
 from loader import SegmentationDataLoader
 from config import BATCH_SIZE, IMAGE_SIZE, input_img_paths, target_img_paths
-from helpers import displayColorImage, displaySegmentImage
+from helpers import displayColorImage, displaySegmentData, displaySegmentImage
 
 
 #%%
@@ -14,7 +14,7 @@ nr_samples = 100
 val_input_img_paths = input_img_paths[-nr_samples:]
 val_target_img_paths = target_img_paths[-nr_samples:]
 
-# %%
+#%%
 val_gen = SegmentationDataLoader(BATCH_SIZE, IMAGE_SIZE, val_input_img_paths, val_target_img_paths)
 
 val_preds = model.predict(val_gen)
@@ -25,6 +25,11 @@ i = 17
 displayColorImage(val_input_img_paths[i])
 # Display ground-truth target mask
 displaySegmentImage(val_target_img_paths[i])
+# Display prediction
+displaySegmentData(val_preds[i])
+
+
+#%%
 
 
 # %%

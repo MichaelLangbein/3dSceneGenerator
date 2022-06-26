@@ -1,10 +1,10 @@
-from inspect import FullArgSpec
+import numpy as np
 from IPython.display import Image, display
 import os
 from PIL.ImageOps import autocontrast
 from datetime import datetime
 from tensorflow import keras
-from tensorflow.keras.preprocessing.image import load_img
+from tensorflow.keras.preprocessing.image import load_img, array_to_img
 
 
 def displayColorImage(path):
@@ -14,6 +14,12 @@ def displayColorImage(path):
 def displaySegmentImage(path):
     # Display auto-contrast version of corresponding target (per-pixel categories)
     img = autocontrast(load_img(path))
+    display(img)
+
+def displaySegmentData(data):
+    mask = np.argmax(data, axis=-1)
+    mask = np.expand_dims(mask, axis=-1)
+    img = autocontrast(array_to_img(mask))
     display(img)
 
 
