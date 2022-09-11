@@ -31,7 +31,6 @@ def downloadOsmData(bbox, queries):
     [out:json];
     (
         way[landuse=forest]( {stringifiedBbox} );
-        way[landuse=meadow]( {stringifiedBbox} );
         way[landuse=orchard]( {stringifiedBbox} );
     );              /* union of the above statements */
     (._;>;);
@@ -59,7 +58,9 @@ def downloadOsmData(bbox, queries):
             response = req.get(overpass_url, params={'data': query})
             jsonData = response.json()
             geoJsonData = o2g.json2geojson(jsonData)
-            # @TODO: filter out single nodes. We only care about polygons.
+            geoJsonData['features'] = [feature 
+                for feature in geoJsonData['features']
+                if feature['geometry']['type'] == 'Polygon' or feature['geometry']['type'] == 'MultiPolygon']
             filePath = os.path.join(overpassDir, name + '.geo.json')
             with open(filePath, 'w') as fh:
                 json.dump(geoJsonData, fh, indent=4)
