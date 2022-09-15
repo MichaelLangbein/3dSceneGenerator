@@ -1,7 +1,6 @@
 #%% imports
 import os
 import argparse as ap
-import requests as req
 from urllib.parse import urlparse
 
 from pystac_client import Client
@@ -112,9 +111,6 @@ def downloadSentinelData(bbox, maxItems = 4, maxCloudCover = 10, targetProjectio
     print("Done!")
 
 
-#%%
-bbox = [11.3, 48.0, 11.4, 48.1]
-downloadSentinelData(bbox, 1, 5)
 
 
 #%%

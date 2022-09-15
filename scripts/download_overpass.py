@@ -20,31 +20,28 @@ os.makedirs(overpassDir, exist_ok=True)
 
 #%% Part 1: download osm data
 
-def downloadOsmData(bbox, queries):
+def downloadOsmData(overpassUrl, outputDir, bbox, queries):
     stringifiedBbox = f"{bbox[1]},{bbox[0]},{bbox[3]},{bbox[2]}"
     
     buildingQuery = f"""
-        [out:json];     /* output in json format */
-        way[building]( {stringifiedBbox} );
-        (._;>;);        /* get the nodes that make up the ways  */
+        [out:json];
+        way[building]({stringifiedBbox})->._;
         out geom;
     """
     
     treesQuery = f"""
-    [out:json];
-    (
-        way[landuse=forest]( {stringifiedBbox} );
-        way[landuse=orchard]( {stringifiedBbox} );
-    );              /* union of the above statements */
-    (._;>;);
-    out geom;
+        [out:json];
+        (
+            way[landuse=forest]({stringifiedBbox});
+            way[landuse=orchard]({stringifiedBbox});
+        )->._;
+        out geom;
     """
     
     waterQuery = f"""
-    [out:json];
-    way[natural=water]( {stringifiedBbox} );
-    (._;>;);
-    out geom;
+        [out:json];
+        way[natural=water]({stringifiedBbox})->._;
+        out geom;
     """
     
     namedQueries = {
@@ -54,17 +51,16 @@ def downloadOsmData(bbox, queries):
     }
     
     
-    overpass_url = "http://overpass-api.de/api/interpreter"
     for name, query in namedQueries.items():
         if name in queries:
             print(f"Executing {name} query...")
-            response = req.get(overpass_url, params={'data': query})
+            response = req.get(overpassUrl, params={'data': query})
             jsonData = response.json()
             geoJsonData = o2g.json2geojson(jsonData)
             geoJsonData['features'] = [feature 
                 for feature in geoJsonData['features']
                 if feature['geometry']['type'] == 'Polygon' or feature['geometry']['type'] == 'MultiPolygon']
-            filePath = os.path.join(overpassDir, name + '.geo.json')
+            filePath = os.path.join(outputDir, name + '.geo.json')
             with open(filePath, 'w') as fh:
                 json.dump(geoJsonData, fh, indent=4)
     print("Done!")
@@ -72,9 +68,13 @@ def downloadOsmData(bbox, queries):
 #%%
 if __name__ == '__main__':
     parser = ap.ArgumentParser(description='Downloads OSM data through a selection of pre-defined overpass-queries')
+    parser.add_argument('--overpass-url', required=False, type=str, default='http://overpass-api.de/api/interpreter', help='Url of overpass-api to query')
+    parser.add_argument('--data-dir', required=False, type=str, default=overpassDir, help='directory where downloaded data should be kept')
     parser.add_argument('--bbox', required=True, type=float, nargs=4, help='Bbox in EPSG:4326. Space separated list. Example: --bbox 11.21309 48.0658 11.30064 48.0916')
     parser.add_argument('--queries', required=True, type=str, nargs='+', help='Types of data to query. Must be last argument used. Example: --queries buildings water trees')
 
     args = parser.parse_args()
 
-    downloadOsmData(args.bbox, args.queries)
+    downloadOsmData(args.overpass_url, args.data_dir, args.bbox, args.queries)
+
+# %%

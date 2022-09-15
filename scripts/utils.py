@@ -4,6 +4,11 @@ import requests as req
 import zipfile as z
 
 
+def fileExists(path):
+    return os.path.exists(path)
+
+
+
 def downloadFromUrlTo(url, targetPath):
     os.makedirs(targetPath, exist_ok=True)
     name = urlparse(url).path.split("/").pop()
