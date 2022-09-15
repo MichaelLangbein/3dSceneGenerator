@@ -7,3 +7,7 @@ Create Scene by:
    - -> Extrude buildings and trees from mesh
    - -> Custom shaders for rocks, water
 
+
+
+1. Realistic scene
+2. Mapbox-style scene
